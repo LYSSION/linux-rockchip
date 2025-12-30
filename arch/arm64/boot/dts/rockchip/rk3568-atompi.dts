@@ -126,13 +126,13 @@
 		};
 	};
 
-	rk809_sound: rk809-sound {
+    rk809_sound: rk809-sound {
 		status = "okay";
 		compatible = "simple-audio-card";
 		simple-audio-card,format = "i2s";
 		simple-audio-card,name = "rockchip,rk809-codec";
+		simple-audio-card,hp-det-gpio = <&gpio1 RK_PA4 GPIO_ACTIVE_HIGH>;
 		simple-audio-card,mclk-fs = <256>;
-
 		simple-audio-card,cpu {
 			sound-dai = <&i2s1_8ch>;
 		};
@@ -143,10 +143,11 @@
 
 	rk_headset: rk-headset {
 		compatible = "rockchip_headset";
-		headset_gpio = <&gpio2 RK_PD2 GPIO_ACTIVE_HIGH>;
+		headset_gpio = <&gpio1 RK_PA4 GPIO_ACTIVE_HIGH>;
 		pinctrl-names = "default";
 		pinctrl-0 = <&hp_det>;
-		io-channels = <&saradc 2>;    //HP_HOOK pin
+		io-channels = <&saradc 5>;
+        status="disabled";
 	};
 
 	dc_12v: dc-12v {
@@ -339,13 +340,6 @@
     status = "okay";
 };
 
-&gpu {
-	clock-names = "gpu", "bus";
-	interrupt-names = "gpu", "mmu", "job";
-	mali-supply = <&vdd_gpu>;
-	status = "okay";
-};
-
 &hdmi {
 	status = "okay";
 	pinctrl-0 = <&hdmitx_scl &hdmitx_sda &hdmitxm1_cec>;
@@ -427,7 +421,7 @@
 		};
 
 		rtc {
-			status = "disabled";
+			status = "okay";
 		};
 
 		pinctrl_rk8xx: pinctrl_rk8xx {
@@ -649,7 +643,7 @@
 			assigned-clock-rates = <12288000>;
 			assigned-clock-parents = <&cru I2S1_MCLKOUT_TX>, <&cru I2S1_MCLKOUT_TX>;
 			pinctrl-names = "default";
-			pinctrl-0 = <&i2s1m0_mclk>;
+			pinctrl-0 = <&i2s1m0_mclk &hp_det>;
 			hp-volume = <20>;
 			spk-volume = <3>;
 			mic-in-differential;
@@ -1091,32 +1085,17 @@
 
 	usb {
 		vcc5v0_host_en: vcc5v0-host-en {
-			rockchip,pins = <0 RK_PD3 RK_FUNC_GPIO &pcfg_pull_none>;
+			rockchip,pins = <0 RK_PA6 RK_FUNC_GPIO &pcfg_pull_none>;
 		};
 
 		vcc5v0_otg_en: vcc5v0-otg-en {
-			rockchip,pins = <0 RK_PD4 RK_FUNC_GPIO &pcfg_pull_none>;
+			rockchip,pins = <0 RK_PA5 RK_FUNC_GPIO &pcfg_pull_none>;
+		};
+
+		vcc5v0_hub_en: vcc5v0-hub-en {
+			rockchip,pins = <0 RK_PD5 RK_FUNC_GPIO &pcfg_pull_none>;
 		};
 	};
-
-	pcie {
-        vcc3v3_pcie_en: vcc3v3-pcie-en {
-			rockchip,pins = <0 RK_PD5 RK_FUNC_GPIO &pcfg_pull_none>;
-
-		};
-
-        vcc3v3_pcie30_clk_en: vcc3v3-pcie30-clk-en {
-			rockchip,pins = <0 RK_PD6 RK_FUNC_GPIO &pcfg_pull_none>;
-		};
-
-        vcc3v3_pcie20_wifi_en: vcc3v3-pcie20-wifi-en {
-			rockchip,pins = <3 RK_PA2 RK_FUNC_GPIO &pcfg_pull_none>;
-		};
-
-		wifi_regon_pin: wifi-regon-pin {
-			rockchip,pins = <0 RK_PC0 RK_FUNC_GPIO &pcfg_output_high_pull_up>;
-		};
-    };
 
 	sdio-pwrseq {
 		wifi_enable_h: wifi-enable-h {
@@ -1124,9 +1103,21 @@
 		};
 	};
 
+	wireless-wlan {
+		wifi_host_wake_irq: wifi-host-wake-irq {
+			rockchip,pins = <3 RK_PD5 RK_FUNC_GPIO &pcfg_pull_down>;
+		};
+	};
+
+	wireless-bluetooth {
+		uart1_gpios: uart1-gpios {
+			rockchip,pins = <2 RK_PB5 RK_FUNC_GPIO &pcfg_pull_none>;
+		};
+	};
+
 	headphone {
 		hp_det: hp-det {
-			rockchip,pins = <1 RK_PA4 RK_FUNC_GPIO &pcfg_pull_up>;
+			rockchip,pins = <2 RK_PD2 RK_FUNC_GPIO &pcfg_pull_up>;
 		};
 	};
 
